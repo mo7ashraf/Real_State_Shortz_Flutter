@@ -1,0 +1,53 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    // Must come after Android/Kotlin
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"    // keep only if you have google-services.json
+}
+
+android {
+    namespace "com.retrytech.shortzz"
+
+    // Stick to SDKs that AGP 7.4.x handles comfortably
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.retrytech.app.shortzz"
+        minSdk 24
+        targetSdk 36
+
+        versionCode 5
+        versionName "1.0.5"
+    }
+
+    // JDK 11 toolchain
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+        coreLibraryDesugaringEnabled true
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            shrinkResources false
+            minifyEnabled false
+            signingConfig signingConfigs.debug // replace with your release keystore when ready
+        }
+    }
+}
+
+dependencies {
+    // Match desugar lib with JDK 11 toolchain
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
+}
+
+flutter {
+    source "../.."
+}

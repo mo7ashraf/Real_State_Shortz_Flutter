@@ -1,0 +1,61 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    namespace project.group
+                }
+            }
+        }
+    }
+}
+
+
+// Force legacy plugins (e.g., deepar_flutter_plus) to build against modern SDK
+subprojects { project ->
+    afterEvaluate {
+        if (project.plugins.hasPlugin('com.android.library') && project.hasProperty('android')) {
+            try {
+                // Align compile/target SDKs with the app to satisfy AAR metadata checks
+                project.android {
+                    // AGP 8+ supports `compileSdk`/`targetSdk` properties
+                    compileSdk = 36
+                    defaultConfig {
+                        targetSdk = 36
+                    }
+                }
+            } catch (ignored) {
+                // Fallback for older AGP using *Version setters
+                try {
+                    project.android {
+                        compileSdkVersion 36
+                        defaultConfig {
+                            targetSdkVersion 36
+                        }
+                    }
+                } catch (e) {
+                    // Leave as-is if plugin doesn't expose android DSL as expected
+                }
+            }
+        }
+    }
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
