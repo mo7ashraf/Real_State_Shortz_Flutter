@@ -256,6 +256,12 @@ class FirebaseNotificationManager {
   }
 
   Future<String?> getNotificationToken() async {
+    // In debug builds, avoid hitting FCM and return a stable dummy token
+    if (kDebugMode) {
+      const token = 'dev-token';
+      Loggers.info('DeviceToken (debug) $token');
+      return token;
+    }
     try {
       String? token = await FirebaseMessaging.instance.getToken();
       Loggers.info('DeviceToken $token');

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shortzz/common/controller/base_controller.dart';
+import 'package:shortzz/utilities/const_res.dart';
 import 'package:shortzz/common/manager/haptic_manager.dart';
 import 'package:shortzz/common/manager/logger.dart';
 import 'package:shortzz/common/manager/session_manager.dart';
@@ -16,7 +17,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 extension StringExtention on String {
   String addBaseURL() {
-    return (SessionManager.instance.getSettings()?.itemBaseUrl ?? '') + this;
+    final value = this;
+    if (value.isEmpty) return value;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return value;
+    }
+    final configured = SessionManager.instance.getSettings()?.itemBaseUrl;
+    final root = (configured != null && configured.isNotEmpty) ? configured : baseURL;
+    if (root.endsWith('/') && value.startsWith('/')) {
+      return root + value.substring(1);
+    } else if (!root.endsWith('/') && !value.startsWith('/')) {
+      return '$root/$value';
+    } else {
+      return root + value;
+    }
   }
 
   Future<StatusModel> get lunchUrlWithHttps async {

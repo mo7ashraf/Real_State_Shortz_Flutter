@@ -15,6 +15,7 @@ import 'package:shortzz/languages/dynamic_translations.dart';
 import 'package:shortzz/languages/languages_keys.dart';
 import 'package:shortzz/model/general/settings_model.dart';
 import 'package:shortzz/model/user_model/user_model.dart' as user;
+import 'package:shortzz/utilities/const_res.dart';
 import 'package:shortzz/screen/dashboard_screen/dashboard_screen.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -44,6 +45,21 @@ class AuthScreenController extends BaseController {
     }
 
     showLoader();
+
+    // If Firebase email/password auth is disabled, always use local backend login
+    if (!useFirebaseEmailAuth) {
+      final user.User? data = await _registration(
+          identity: email,
+          loginMethod: LoginMethod.email,
+          fullname: GetUtils.isEmail(email) ? email.split('@')[0] : null,
+          loginVia: LoginVia.logInFakeUser,
+          password: password);
+      stopLoader();
+      if (data != null) {
+        _navigateScreen(data);
+      }
+      return;
+    }
 
     if (GetUtils.isEmail(email)) {
       final UserCredential? credential = await signInWithEmailAndPassword();
@@ -97,6 +113,22 @@ class AuthScreenController extends BaseController {
       return showSnackBar(LKey.passwordMismatch.tr);
     }
     showLoader();
+
+    // Local-only account create when Firebase email auth is disabled
+    if (!useFirebaseEmailAuth) {
+      final user.User? data = await _registration(
+          identity: emailController.text.trim(),
+          loginMethod: LoginMethod.email,
+          fullname: fullNameController.text.trim(),
+          loginVia: LoginVia.logInFakeUser,
+          password: passwordController.text.trim());
+      stopLoader();
+      if (data != null) {
+        _navigateScreen(data);
+      }
+      return;
+    }
+
     UserCredential? credential = await createUserWithEmailAndPassword();
     if (credential != null) {
       await _registration(
@@ -164,7 +196,8 @@ class AuthScreenController extends BaseController {
       required LoginVia loginVia,
       String? password}) async {
     String? deviceToken = await FirebaseNotificationManager.instance.getNotificationToken();
-    if (deviceToken == null) return null;
+    // Allow login to proceed in dev when FCM is not configured
+    deviceToken ??= 'dev-token';
 
     user.User? userData;
     switch (loginVia) {
@@ -189,7 +222,18 @@ class AuthScreenController extends BaseController {
           token: userData?.deviceToken,
           authorizationToken: userData?.token?.authToken);
     }
-    SubscriptionManager.shared.login('${userData?.id}');
+    // Login to RevenueCat only when configured
+    try {
+      if (revenueCatAndroidApiKey.isNotEmpty || revenueCatAppleApiKey.isNotEmpty) {
+        await SubscriptionManager.shared.initPlatformState();
+        // Only attempt login if purchases SDK configured successfully
+        if (isPurchaseConfig) {
+          await SubscriptionManager.shared.login('${userData?.id}');
+        }
+      }
+    } catch (e) {
+      Loggers.warning('RevenueCat login skipped: $e');
+    }
     if (userData != null) {
       // Subscribe My Following Ids For Live streaming notification
       return userData;
@@ -266,6 +310,11 @@ class AuthScreenController extends BaseController {
     final email = forgetEmailController.text.trim();
     if (email.isEmpty) {
       showSnackBar(LKey.enterEmail.tr);
+      return;
+    }
+    if (!useFirebaseEmailAuth) {
+      // No local password reset endpoint; inform user for dev
+      showSnackBar('Password reset via app disabled in dev.');
       return;
     }
     showLoader();
