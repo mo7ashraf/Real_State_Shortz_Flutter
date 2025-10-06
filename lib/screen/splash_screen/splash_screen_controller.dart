@@ -25,6 +25,7 @@ import 'package:shortzz/utilities/app_res.dart';
 class SplashScreenController extends BaseController {
   late StreamSubscription _subscription;
   bool isOnline = true;
+  bool _noInternetVisible = false;
 
   @override
   void onReady() {
@@ -35,9 +36,15 @@ class SplashScreenController extends BaseController {
     _subscription = NetworkHelper().onConnectionChange.listen((status) {
       isOnline = status;
       if (isOnline) {
-        Get.back();
+        if (_noInternetVisible && Get.isOverlaysOpen == true) {
+          Get.back();
+          _noInternetVisible = false;
+        }
       } else {
-        Get.to(() => const NoInternetSheet(), transition: Transition.downToUp);
+        if (!_noInternetVisible) {
+          _noInternetVisible = true;
+          Get.to(() => const NoInternetSheet(), transition: Transition.downToUp);
+        }
       }
     });
   }
@@ -57,9 +64,9 @@ class SplashScreenController extends BaseController {
       Loggers.error('fetchSettings error: $e');
     }
 
-    if (!showNavigate && kDebugMode) {
-      // Dev fallback: navigate even if settings fail (e.g., backend on localhost is down)
-      Loggers.warning('Settings not loaded; proceeding with dev fallback navigation');
+    if (!showNavigate) {
+      // Fallback: navigate even if settings fail (e.g., backend on localhost is down)
+      Loggers.warning('Settings not loaded; proceeding with fallback navigation');
       SessionManager.instance.setFallbackLang('en');
       if (SessionManager.instance.isLogin()) {
         Get.off(() => const DashboardScreen());
@@ -69,14 +76,18 @@ class SplashScreenController extends BaseController {
       return;
     }
 
-    if (!showNavigate) return;
-
     final translations = Get.find<DynamicTranslations>();
     var setting = SessionManager.instance.getSettings();
     var languages = setting?.languages ?? [];
     List<Language> downloadLanguages = languages.where((element) => element.status == 1).toList();
     if (downloadLanguages.isEmpty) {
-      showSnackBar(AppRes.languageAdd, second: 5);
+      // If backend returns no languages, continue silently with English fallback.
+      SessionManager.instance.setFallbackLang('en');
+      if (SessionManager.instance.isLogin()) {
+        Get.off(() => const DashboardScreen());
+      } else {
+        Get.off(() => const LoginScreen());
+      }
       return;
     }
 
@@ -88,6 +99,9 @@ class SplashScreenController extends BaseController {
 
     if (defaultLang != null) {
       SessionManager.instance.setFallbackLang(defaultLang.code ?? 'en');
+    } else {
+      // Ensure we always have a language set
+      SessionManager.instance.setFallbackLang('en');
     }
 
     RestartWidget.restartApp(Get.context!);

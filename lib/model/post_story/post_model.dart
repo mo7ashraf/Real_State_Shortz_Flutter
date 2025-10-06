@@ -87,7 +87,18 @@ class Post {
         ? PostType.fromString(json['post_type'])
         : PostType.none;
     userId = json['user_id'];
-    metadata = json['metadata'];
+    final md = json['metadata'];
+    if (md == null) {
+      metadata = null;
+    } else if (md is String) {
+      metadata = md;
+    } else {
+      try {
+        metadata = jsonEncode(md);
+      } catch (_) {
+        metadata = md.toString();
+      }
+    }
     soundId = json['sound_id'];
     description = json['description'];
     hashtags = json['hashtags'];

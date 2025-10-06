@@ -27,7 +27,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Shortzz"
+        android:label="@string/app_name"
         android:enableOnBackInvokedCallback="true"
         android:usesCleartextTraffic="true">
         <activity
@@ -87,7 +87,7 @@
             android:value="______ GOOGLE API ________" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="shortzz" />
+            android:value="aqar_shorts" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713" />

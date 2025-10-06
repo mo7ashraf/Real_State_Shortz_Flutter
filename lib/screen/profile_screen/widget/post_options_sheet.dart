@@ -48,7 +48,8 @@ class PostOptionsSheet extends StatelessWidget {
                                     createType: CreateFeedType.feed,
                                     onAddPost: controller.onAddPost));
                               case PublishType.story:
-                                Get.to(() => const CameraScreen(cameraType: CameraScreenType.story));
+                                Get.to(() => const CameraScreen(
+                                    cameraType: CameraScreenType.story));
                               case PublishType.reels:
                                 Get.to(() => const CameraScreen(
                                     cameraType: CameraScreenType.post));

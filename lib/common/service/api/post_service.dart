@@ -20,6 +20,7 @@ import 'package:shortzz/model/post_story/story/story_model.dart';
 import 'package:shortzz/model/post_story/user_post_model.dart';
 import 'package:shortzz/model/user_model/user_model.dart';
 import 'package:shortzz/utilities/app_res.dart';
+import 'package:shortzz/utilities/const_res.dart';
 
 enum PostType {
   reel,
@@ -60,6 +61,7 @@ class PostService {
   PostService._();
 
   static final PostService instance = PostService._();
+  static final Map<String, int> _profilePages = {};
 
   Future<List<Post>> fetchPostsDiscover(
       {required String type, CancelToken? cancelToken}) async {
@@ -159,7 +161,39 @@ class PostService {
           Params.lastItemId: lastItemId
         },
         fromJson: UserPostModel.fromJson);
-    return model.data;
+    // If legacy endpoint returns no data (or backend not wired), try RESTful route once
+    if (model.data?.posts?.isNotEmpty == true || model.data?.pinnedPostList?.isNotEmpty == true) {
+      return model.data;
+    }
+    try {
+      final key = '${userId}_${type}_profile';
+      _profilePages[key] = (lastItemId == null) ? 1 : ((_profilePages[key] ?? 1) + 1);
+      final restType = type == PostType.reels ? 'reel' : 'image';
+      final url = '${apiURL}users/${userId ?? ''}/posts?type=$restType&page=${_profilePages[key]}&per_page=${AppRes.paginationLimit}';
+      final json = await ApiService.instance.callGet(url: url);
+      final List data = (json is Map && json['data'] is List) ? json['data'] : [];
+      final posts = data.map((e) => Post.fromJson(e)).toList().cast<Post>();
+      return UserPostData(posts: posts, pinnedPostList: []);
+    } catch (_) {
+      return model.data;
+    }
+  }
+
+  // Optional direct RESTful fetch, if you want to call it explicitly
+  Future<UserPostData?> fetchUserPostsRestful({
+    required bool reelsTab,
+    required int? userId,
+    int? page,
+    int? perPage,
+  }) async {
+    final key = '${userId}_${reelsTab ? 'reel' : 'image'}_profile_explicit';
+    final p = page ?? ((_profilePages[key] = (_profilePages[key] ?? 0) + 1));
+    final restType = reelsTab ? 'reel' : 'image';
+    final url = '${apiURL}users/${userId ?? ''}/posts?type=$restType&page=$p&per_page=${perPage ?? AppRes.paginationLimit}';
+    final json = await ApiService.instance.callGet(url: url);
+    final List data = (json is Map && json['data'] is List) ? json['data'] : [];
+    final posts = data.map((e) => Post.fromJson(e)).toList().cast<Post>();
+    return UserPostData(posts: posts, pinnedPostList: []);
   }
 
   Future<HashtagPostData?> fetchPostsByHashtag(

@@ -12,6 +12,7 @@ class NetworkHelper {
 
   final _connectivity = Connectivity();
   final _controller = StreamController<bool>.broadcast();
+  bool? _lastEmitted; // avoid duplicate emissions
 
   Stream<bool> get onConnectionChange => _controller.stream;
 
@@ -20,8 +21,11 @@ class NetworkHelper {
   }
 
   Future<void> _checkConnection(List<ConnectivityResult> result) async {
-    bool isOnline = await InternetConnection().hasInternetAccess;
-    _controller.sink.add(isOnline);
+    final isOnline = await InternetConnection().hasInternetAccess;
+    if (_lastEmitted == null || _lastEmitted != isOnline) {
+      _lastEmitted = isOnline;
+      _controller.sink.add(isOnline);
+    }
   }
 
   Future<bool> checkNow() async {

@@ -299,7 +299,8 @@ class LiveStreamSearchScreenController extends BaseController {
 
   Future<void> onGoLive() async {
     User? myUser = SessionManager.instance.getUser();
-    bool isExist = livestreamList.any((element) => element.hostId == myUser?.id);
+    bool isExist =
+        livestreamList.any((element) => element.hostId == myUser?.id);
     if (myUser?.isDummy == 1 && isExist) {
       return showSnackBar(LKey.yourProfileIsAlreadyInUseForDummyEtc.tr);
     }

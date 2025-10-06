@@ -147,6 +147,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -172,6 +174,7 @@ flutter:
     - assets/icons/
     - assets/csv/
     - assets/audios/
+    - assets/branding/
     - android/app/src/main/res/mipmap-hdpi/
     - ios/Runner/Assets.xcassets/AppIcon.appiconset/
 
@@ -255,3 +258,21 @@ flutter:
       fonts:
         - asset: assets/fonts/Unbounded-SemiBold.ttf
           weight: 600
+
+# Launcher icon configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/branding/aqar_shorts_icon_1024.png
+  adaptive_icon_background: "#FFFFFF" # set to your brand color
+  adaptive_icon_foreground: assets/branding/aqar_shorts_icon_1024.png
+  adaptive_icon_monochrome: assets/branding/aqar_shorts_icon_1024.png
+  remove_alpha_ios: true
+
+# Splash screen configuration
+flutter_native_splash:
+  color: "#FFFFFF"  # set to your brand color
+  image: assets/branding/aqar_shorts_icon_1024.png
+  android_12:
+    image: assets/branding/aqar_shorts_icon_1024.png
+    icon_background_color: "#FFFFFF"

@@ -78,12 +78,13 @@ class ProfileScreenController extends BlockUserController
     super.onClose();
   }
 
-  iniData() {
-    Future.wait({
-      fetchUserDetail(),
-      fetchReel(),
-      fetchPost(),
-    });
+  Future<void> iniData() async {
+    // Ensure user details are available before loading lists
+    await fetchUserDetail();
+    await Future.wait([
+      fetchReel(isEmpty: true),
+      fetchPost(isEmpty: true),
+    ]);
   }
 
   void onTabChanged(int value) {
@@ -107,6 +108,10 @@ class ProfileScreenController extends BlockUserController
     if (isReelLoading.value) return;
     isReelLoading.value = true;
     try {
+      if (userData.value?.id == null) {
+        isReelLoading.value = false;
+        return;
+      }
       UserPostData? items = await PostService.instance.fetchUserPosts(
           type: PostType.reels,
           userId: userData.value?.id?.toInt(),
@@ -133,11 +138,14 @@ class ProfileScreenController extends BlockUserController
   Future<void> fetchPost({bool isEmpty = false}) async {
     if (isPostLoading.value) return;
     isPostLoading.value = true;
-    // Fetch user posts
+    // Fetch user posts for the profile user
+    if (userData.value?.id == null) {
+      isPostLoading.value = false;
+      return;
+    }
     UserPostData? items = await PostService.instance.fetchUserPosts(
       type: PostType.posts,
-      userId:
-          userData.value?.id?.toInt() ?? SessionManager.instance.getUserID(),
+      userId: userData.value?.id?.toInt(),
       lastItemId: isEmpty ? null : posts.lastOrNull?.id?.toInt(),
     );
 

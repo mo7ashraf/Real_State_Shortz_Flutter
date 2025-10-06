@@ -209,6 +209,18 @@ class AuthScreenController extends BaseController {
             .logInFakeUser(identity: identity, loginMethod: loginMethod, deviceToken: deviceToken, password: password);
     }
 
+    // Dev-friendly fallback: if fake login fails while Firebase email auth is disabled,
+    // try the non-password endpoint to auto-create/login the account.
+    if (userData == null && loginVia == LoginVia.logInFakeUser && !useFirebaseEmailAuth) {
+      final inferredName = fullname ?? (GetUtils.isEmail(identity) ? identity.split('@').first : identity);
+      try {
+        userData = await UserService.instance
+            .logInUser(identity: identity, loginMethod: loginMethod, deviceToken: deviceToken, fullName: inferredName);
+      } catch (_) {
+        // ignore and keep null
+      }
+    }
+
     Setting? setting = SessionManager.instance.getSettings();
     if (userData?.isDummy == 0 && userData?.newRegister == true && setting?.registrationBonusStatus == 1) {
       final translations = Get.find<DynamicTranslations>();

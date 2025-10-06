@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shortzz/common/manager/brand_colors.dart';
 import 'package:shortzz/utilities/color_res.dart';
 import 'package:shortzz/utilities/font_res.dart';
 
@@ -19,23 +20,24 @@ class ThemeRes {
           trackShape: RectangularSliderTrackShape(),
           overlayShape: RoundSliderOverlayShape(overlayRadius: 0),
           overlayColor: Colors.transparent),
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(color: ColorRes.whitePure),
-        titleMedium: TextStyle(color: ColorRes.textDarkGrey),
-        titleSmall: TextStyle(color: ColorRes.textLightGrey),
-        labelSmall: TextStyle(color: ColorRes.themeAccentSolid),
-        labelLarge: TextStyle(color: ColorRes.disabledGrey),
+      textTheme: TextTheme(
+        titleLarge: const TextStyle(color: ColorRes.whitePure),
+        titleMedium: const TextStyle(color: ColorRes.textDarkGrey),
+        titleSmall: const TextStyle(color: ColorRes.textLightGrey),
+        labelSmall: TextStyle(color: BrandColors.accent),
+        labelLarge: const TextStyle(color: ColorRes.disabledGrey),
       ),
       textSelectionTheme:
           const TextSelectionThemeData(selectionColor: ColorRes.disabledGrey),
       cardTheme: const CardThemeData(color: ColorRes.blueFollow),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      primaryColor: ColorRes.themeAccentSolid,
+      // Pull brand colors (computed from assets) with fallbacks
+      primaryColor: BrandColors.accent,
       dividerColor: ColorRes.bgGrey,
       cardColor: ColorRes.bgMediumGrey,
       primaryColorDark: ColorRes.blackPure,
-      canvasColor: ColorRes.themeColor,
+      canvasColor: BrandColors.primary,
       useMaterial3: false,
     );
   }

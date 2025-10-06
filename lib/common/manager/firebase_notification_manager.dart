@@ -51,8 +51,8 @@ class FirebaseNotificationManager {
       FlutterLocalNotificationsPlugin();
   RxString notificationPayload = ''.obs;
   AndroidNotificationChannel channel = const AndroidNotificationChannel(
-      'shortzz', // id
-      'Shortzz', // title
+      'aqar_shorts', // id
+      'Aqar Shorts', // title
       playSound: true,
       enableLights: true,
       enableVibration: true,

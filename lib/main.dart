@@ -16,6 +16,7 @@ import 'package:shortzz/common/widget/restart_widget.dart';
 import 'package:shortzz/languages/dynamic_translations.dart';
 import 'package:shortzz/screen/splash_screen/splash_screen.dart';
 import 'package:shortzz/utilities/theme_res.dart';
+import 'package:shortzz/common/manager/brand_colors.dart';
 
 import 'common/service/network_helper/network_helper.dart';
 
@@ -54,6 +55,9 @@ Future<void> main() async {
 
     // Load Translations
     Get.put(DynamicTranslations());
+
+    // Initialize brand colors from assets before building Theme
+    await BrandColors.initFromAsset();
 
     // Run app
     runApp(const RestartWidget(child: MyApp()));
