@@ -91,56 +91,52 @@ class SelectLanguageScreen extends StatelessWidget {
                 },
                 Expanded(
                   child: ListView.builder(
-                      itemCount: controller.languages.length,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 25),
-                      itemBuilder: (context, index) {
-                        Language language = controller.languages[index];
-                        return Obx(
-                          () {
-                            bool isSelected =
-                                language == controller.selectedLanguage.value;
-                            return RadioGroup<Language?>(
-                              groupValue: controller.selectedLanguage.value,
-                              onChanged: controller.onLanguageChange,
-                              child: Container(
-                                height: 60,
-                                alignment: Alignment.center,
-                                margin: const EdgeInsets.symmetric(vertical: 2),
-                                decoration: ShapeDecoration(
-                                  shape: SmoothRectangleBorder(
-                                    borderRadius: SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 1),
-                                    side: isSelected
-                                        ? BorderSide(color: whitePure(context))
-                                        : const BorderSide(color: Colors.transparent),
-                                  ),
-                                  color: whitePure(context).withValues(alpha: isSelected ? .3 : .1),
-                                ),
-                                child: RadioListTile<Language?>(
-                                    value: language,
-                                    activeColor: whitePure(context),
-                                    fillColor: WidgetStatePropertyAll(whitePure(context)),
-                                    splashRadius: 0,
-                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    dense: true,
-                                    visualDensity: const VisualDensity(
-                                      horizontal: VisualDensity.minimumDensity,
-                                      vertical: VisualDensity.minimumDensity,
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                    title: Text(
-                                      language.localizedTitle ?? '',
-                                      style: TextStyleCustom.outFitLight300(fontSize: 15, color: whitePure(context)),
-                                    ),
-                                    subtitle: Text(
-                                      language.title ?? '',
-                                      style: TextStyleCustom.outFitMedium500(fontSize: 17, color: whitePure(context)),
-                                    )),
-                              ),
-                            );
-                          },
+                    itemCount: controller.languages.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+                    itemBuilder: (context, index) {
+                      final language = controller.languages[index];
+                      return Obx(() {
+                        final isSelected = language == controller.selectedLanguage.value;
+                        return Container(
+                          height: 60,
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.symmetric(vertical: 2),
+                          decoration: ShapeDecoration(
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 1),
+                              side: isSelected
+                                  ? BorderSide(color: whitePure(context))
+                                  : const BorderSide(color: Colors.transparent),
+                            ),
+                            color: whitePure(context).withValues(alpha: isSelected ? .3 : .1),
+                          ),
+                          child: RadioListTile<Language?>(
+                            value: language,
+                            groupValue: controller.selectedLanguage.value,
+                            onChanged: (Language? val) => controller.onLanguageChange(val),
+                            activeColor: whitePure(context),
+                            fillColor: MaterialStateProperty.all(whitePure(context)),
+                            splashRadius: 0,
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            dense: true,
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              language.localizedTitle ?? '',
+                              style: TextStyleCustom.outFitLight300(fontSize: 15, color: whitePure(context)),
+                            ),
+                            subtitle: Text(
+                              language.title ?? '',
+                              style: TextStyleCustom.outFitMedium500(fontSize: 17, color: whitePure(context)),
+                            ),
+                          ),
                         );
-                      }),
+                      });
+                    },
+                  ),
                 ),
                 if (languageNavigationType == LanguageNavigationType.fromStart)
                   TextButtonCustom(

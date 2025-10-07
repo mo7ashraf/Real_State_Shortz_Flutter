@@ -1,4 +1,4 @@
-package com.retrytech.shortzz
+package com.mobileaders.aqarshare
 
 import com.baseflow.permissionhandler.PermissionHandlerPlugin
 import com.retrytech.retrytech_plugin.RetrytechPlugin

@@ -7,13 +7,13 @@ plugins {
 }
 
 android {
-    namespace "com.retrytech.shortzz"
+    namespace "com.mobileaders.aqarshare"
 
     // Stick to SDKs that AGP 7.4.x handles comfortably
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.retrytech.app.shortzz"
+        applicationId "com.mobileaders.aqarshare"
         minSdk 24
         targetSdk 36
 

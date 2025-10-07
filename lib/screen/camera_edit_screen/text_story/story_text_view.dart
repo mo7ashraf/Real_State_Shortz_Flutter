@@ -176,10 +176,9 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
                 alignment: Alignment.center,
                 transform: Matrix4.identity()
                   ..rotateZ(widget.data.fontAngle)
-                  ..scaleByDouble(
+                  ..scale(
                     widget.data.fontScale,
                     widget.data.fontScale,
-                    1.0,
                     1.0,
                   ),
                 child: Container(

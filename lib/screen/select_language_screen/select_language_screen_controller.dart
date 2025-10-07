@@ -30,7 +30,7 @@ class SelectLanguageScreenController extends BaseController {
     if (languageNavigationType == LanguageNavigationType.fromStart) {
       openEULASheet();
     }
-    AdsManager.instance.requestConsentInfoUpdate();
+   // AdsManager.instance.requestConsentInfoUpdate();
   }
 
   Future<void> openEULASheet() async {
@@ -55,9 +55,10 @@ class SelectLanguageScreenController extends BaseController {
         languages.add(element);
       }
     }
-    selectedLanguage.value = languages.firstWhere((element) {
-      return element.code == SessionManager.instance.getLang();
-    }) as Language?;
+    selectedLanguage.value = languages.firstWhere(
+          (element) => element.code == SessionManager.instance.getLang(),
+      orElse: () => languages.isNotEmpty ? languages.first : Language(code: 'en', title: 'English'),
+    );
   }
 
   void onLanguageChange(Language? value) {

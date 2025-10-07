@@ -54,8 +54,8 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-            if (controller.selectedPageIndex.value != 0)
-              const BannerAdsCustom(),
+            // if (controller.selectedPageIndex.value != 0)
+            //   const BannerAdsCustom(),
           ],
         );
       }),
