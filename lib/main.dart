@@ -17,6 +17,8 @@ import 'package:shortzz/languages/dynamic_translations.dart';
 import 'package:shortzz/screen/splash_screen/splash_screen.dart';
 import 'package:shortzz/utilities/theme_res.dart';
 import 'package:shortzz/common/manager/brand_colors.dart';
+import 'package:shortzz/features/property/create_property_screen.dart';
+import 'package:shortzz/utilities/const_res.dart';
 
 import 'common/service/network_helper/network_helper.dart';
 
@@ -81,6 +83,15 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeRes.darkTheme(context),
       theme: ThemeRes.lightTheme(context),
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/create-property': (_) {
+          final int userId = SessionManager.instance.getUserID();
+          final String base = baseURL.replaceAll(RegExp(r'/\$'), '');
+          final String rawToken = SessionManager.instance.getAuthToken();
+          final String? token = (rawToken.isEmpty || rawToken == 'AUTH TOKEN EMPTY') ? null : rawToken;
+          return CreatePropertyScreen(userId: userId, baseUrl: base, token: token);
+        },
+      },
       home: const SplashScreen(),
     );
   }

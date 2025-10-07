@@ -137,6 +137,8 @@ dependencies:
   rxdart: ^0.28.0
   image: ^4.5.4
 
+  file_picker: ^8.0.0
+  
   ### 🔌 Custom Plugins
   retrytech_plugin:
     git:
