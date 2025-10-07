@@ -15,6 +15,8 @@ import 'package:shortzz/screen/home_screen/home_screen.dart';
 import 'package:shortzz/screen/live_stream/live_stream_search_screen/live_stream_search_screen.dart';
 import 'package:shortzz/screen/message_screen/message_screen.dart';
 import 'package:shortzz/screen/profile_screen/profile_screen.dart';
+import 'package:shortzz/screen/create_feed_screen/create_feed_screen.dart';
+import 'package:shortzz/screen/camera_screen/camera_screen.dart';
 import 'package:shortzz/utilities/style_res.dart';
 import 'package:shortzz/utilities/text_style_custom.dart';
 import 'package:shortzz/utilities/theme_res.dart';
@@ -30,6 +32,14 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: scaffoldBackgroundColor(context),
       resizeToAvoidBottomInset: true,
+      floatingActionButton: Obx(() {
+        final idx = controller.selectedPageIndex.value;
+        // Show FAB on Reels (0) and Posts (1) tabs only
+        if (idx == 0 || idx == 1) {
+          return _buildAddFab(context, controller);
+        }
+        return SizedBox.shrink();
+      }),
       body: Obx(() {
         return Column(
           children: [
@@ -41,10 +51,12 @@ class DashboardScreen extends StatelessWidget {
                   IndexedStackChild(
                       child: FeedScreen(myUser: myUser), preload: true),
                   // Show Coming Soon for Live tab while keeping bottom nav visible
-                  IndexedStackChild(child: const ComingSoonLive(), preload: false),
+                  IndexedStackChild(
+                      child: const ComingSoonLive(), preload: false),
                   IndexedStackChild(
                       child: const ExploreScreen(), preload: true),
-                  IndexedStackChild(child: const MessageScreen(), preload: false),
+                  IndexedStackChild(
+                      child: const MessageScreen(), preload: false),
                   IndexedStackChild(
                       child: ProfileScreen(
                           isDashBoard: true,
@@ -60,6 +72,60 @@ class DashboardScreen extends StatelessWidget {
         );
       }),
       bottomNavigationBar: _buildBottomNavigationBar(context, controller),
+    );
+  }
+
+  Widget _buildAddFab(
+      BuildContext context, DashboardScreenController controller) {
+    return FloatingActionButton(
+      onPressed: () => Navigator.pushNamed(context, '/create-property'),
+      backgroundColor: themeAccentSolid(context),
+      child: const Icon(Icons.add, color: Colors.white),
+    );
+  }
+
+  void _showAddMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: whitePure(context),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.article_outlined),
+                  title: const Text('Add Post'),
+                  onTap: () {
+                    Get.back();
+                    Get.to(() => const CreateFeedScreen(
+                          createType: CreateFeedType.feed,
+                        ));
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.video_call_outlined),
+                  title: const Text('Add Reel'),
+                  onTap: () {
+                    Get.back();
+                    Get.to(() => const CameraScreen(
+                          cameraType: CameraScreenType.post,
+                        ));
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
